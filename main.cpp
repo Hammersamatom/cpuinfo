@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 
-std::string cpupath = "/proc/cpuinfo";
+const char* cpupath = "/proc/cpuinfo";
 
 
 std::vector<std::string> split(std::string str, char c = ' ')
@@ -42,7 +42,7 @@ void strReplace(std::string& input, std::string original, std::string replacemen
 
 int main()
 {
-    std::ifstream cpuinfo(cpupath.c_str(), std::ios::binary);
+    std::ifstream cpuinfo(cpupath, std::ios::binary);
 
     if (!cpuinfo.is_open())
     {
@@ -55,9 +55,7 @@ int main()
 
     std::string container;
 
-    bool notRepeating = true;
-
-    while(getline(cpuinfo, container) && notRepeating)
+    while(getline(cpuinfo, container))
     {
         strReplace(container, ":", "\n\r");
 
