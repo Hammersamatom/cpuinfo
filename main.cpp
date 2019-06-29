@@ -1,11 +1,31 @@
 #include <fstream>
 #include <vector>
 #include <stdio.h>
-#include <string>
+#include <cstring>
 #include <algorithm>
 #include <iostream>
 
-const char cpupath[] = {"/proc/cpuinfo"};
+std::string cpupath = "/proc/cpuinfo";
+
+
+std::vector<std::string> split(std::string str, char c = ' ')
+{
+    std::vector<std::string> result;
+
+    const char* c_str = str.c_str();
+
+    do
+    {
+        const char *begin = c_str;
+
+        while(*c_str != c && *c_str)
+            c_str++;
+
+        result.push_back(std::string(begin, c_str));
+    } while (0 != *c_str++);
+
+    return result;
+}
 
 void strReplace(std::string& input, std::string original, std::string replacement)
 {
@@ -22,7 +42,7 @@ void strReplace(std::string& input, std::string original, std::string replacemen
 
 int main()
 {
-    std::ifstream cpuinfo(cpupath, std::ios::binary);
+    std::ifstream cpuinfo(cpupath.c_str(), std::ios::binary);
 
     if (!cpuinfo.is_open())
     {
@@ -35,22 +55,30 @@ int main()
 
     std::string container;
 
-    int i = 0;
+    bool notRepeating = true;
 
-    while(getline(cpuinfo, container))
+    while(getline(cpuinfo, container) && notRepeating)
     {
-        //strReplace(container, "\n", "\r");
         strReplace(container, ":", "\n\r");
-        contain.push_back(container);
-        
-        printf("%i --- %s\n", i, container.c_str());
-        i++;
+
+        if (container == "")
+        {
+            break;
+        }
+
+        std::vector<std::string> tokens = split(container,'\n');
+        for (int i = 0; i < tokens.size(); i++)
+        {
+            contain.push_back(tokens[i]);
+        }
+
+        //contain.push_back(container);
     }
 
-    //for (int i = 0; i < contain.size(); i++)
-    //{
-    //    printf("%s\n", contain[i].c_str());
-    //}
+    for (int i = 0; i < contain.size(); i++)
+    {
+        printf("%s\n", contain[i].c_str());
+    }
     
     return 0;
 }
